@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOVE</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+}
+
+#container {
+    position: absolute;
+    bottom: 30%;
+    text-align: center;
+    color: #b30059;
+    font-size: 22px;
+    font-weight: bold;
+    animation: pulse 1.5s infinite;
+}
+
+.scroll-up {
+    animation: scrollUp 30s linear forwards;
+}
+
+.infinity {
+    position: absolute;
+    font-size: 80px;
+    color: #8000ff;
+    opacity: 0;
+    animation: infinityFade 3s forwards;
+}
+
+.heart {
+    position: absolute;
+    pointer-events: none;
+    animation: floatUp 4s linear forwards;
+}
+
+#hint {
+    position: absolute;
+    bottom: 10%;
+    font-size: 16px;
+    color: #8000ff;
+    opacity: 0.8;
+    animation: pulse 2s infinite;
+}
+
+@keyframes floatUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-120vh); opacity: 0; }
+}
+
+@keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes scrollUp {
+    from { transform: translateY(0); }
+    to { transform: translateY(-220vh); }
+}
+
+@keyframes infinityFade {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="container"></div>
+<div id="hint">💜 Ekrana dokun</div>
+
+<audio id="music" loop>
+    <source src="ask.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const container = document.getElementById("container");
+const music = document.getElementById("music");
+const hint = document.getElementById("hint");
+
+let count = 0;
+let clicks = 0;
+let musicStarted = false;
+
+// 13 satır yazı
+const textInterval = setInterval(() => {
+    container.innerHTML += "I LOVE YOU AYSİMA❤<br>";
+    count++;
+
+    if (count === 13) {
+        clearInterval(textInterval);
+        setTimeout(() => {
+            container.classList.add("scroll-up");
+        }, 1000);
+    }
+}, 1000);
+
+// otomatik pembe kalpler
+setInterval(() => {
+    createHeart("❤", "rgba(255, 0, 100, 0.6)");
+}, 300);
+
+// tıklama / dokunma
+document.addEventListener("pointerdown", (e) => {
+    clicks++;
+
+    if (!musicStarted) {
+        music.volume = 0;
+        music.play();        // 🔥 müzik burada başlar
+        fadeInMusic();
+        musicStarted = true;
+        hint.remove();
+    }
+
+    createHeart("💜", "#8000ff", e.clientX, e.clientY);
+
+    if (clicks === 5) {
+        showInfinity();
+    }
+});
+
+function fadeInMusic() {
+    let vol = 0;
+    const fade = setInterval(() => {
+        vol += 0.03;
+        music.volume = Math.min(vol, 1);
+        if (vol >= 1) clearInterval(fade);
+    }, 100);
+}
+
+function showInfinity() {
+    const inf = document.createElement("div");
+    inf.className = "infinity";
+    inf.innerHTML = "∞";
+    document.body.appendChild(inf);
+}
+
+function createHeart(symbol, color, x = Math.random()*innerWidth, y = innerHeight) {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = symbol;
+    heart.style.left = x + "px";
+    heart.style.top = y + "px";
+    heart.style.color = color;
+    heart.style.fontSize = (18 + Math.random() * 32) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
+}
+</script>
+
+</body>
+</html>
